@@ -1,0 +1,99 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/material/input_border.dart';
+import 'dart:math';
+
+import '../util/conversion_tools.dart';
+
+class USDtoBTCScreen extends StatefulWidget {
+  @override
+  State<USDtoBTCScreen> createState() => _USDtoBTCScreenState();
+}
+
+final convertMon = new TextEditingController();
+
+class _USDtoBTCScreenState extends State<USDtoBTCScreen> {
+  double btcAmnt = 0;
+  var mon = 0.0;
+  var errTxt = '';
+  bool errTxtShow = false;
+
+double roundDouble(double value, int places){ 
+   double mod = pow(10.0, places); 
+   return ((value * mod).round().toDouble() / mod); 
+}
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(25),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          leading: IconButton(
+              key: Key("back-to-main"),
+              icon: Icon(Icons.arrow_back_ios_new,
+                  color: Color(0xff4c748b), size: 18),
+              onPressed: () => Navigator.of(context).pop())), 
+        ),
+        body: Center (
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget> [
+              Text("USD to BTC",
+              style: TextStyle(fontSize: 40),
+                  key: Key('second-screen-text')),
+              SizedBox(height: 20),
+              Column(
+                children: <Widget>[
+                  Text(
+                    "${mon}",
+                    style: TextStyle(
+                      fontSize: 40,
+                      color: Colors.green,
+                    )
+                  ),
+                  SizedBox(height: 20),
+                   TextField(
+                       decoration: InputDecoration(
+                       border: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(25.0),
+                       ),
+                     ),
+                     key: ValueKey('input-field-one'),
+                    keyboardType: TextInputType.number,
+                    controller: convertMon,
+                    ),
+                    Text(
+                      "${errTxt}",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.red,
+                      )
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: (){
+                        setState((){
+                          double amnt = 0;
+                          try{
+                          amnt = double.parse(convertMon.text);
+                          } on Exception{
+                            errTxt = 'Please input a valid USD amount';
+                          }
+                          mon = roundDouble(ConversionTools.usdToBtc(amnt), 2);
+                        });
+                      },
+                      child: Text('Done'),
+                      key: Key('convert-button'),
+                    )
+                ],
+              ),
+            ],
+          ),
+        ),
+    );
+  }
+}

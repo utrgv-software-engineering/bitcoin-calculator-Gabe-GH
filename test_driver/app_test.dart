@@ -3,38 +3,57 @@ import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Counter App', () {
-    // First, define the Finders and use them to locate widgets from the
-    // test suite. Note: the Strings provided to the `byValueKey` method must
-    // be the same as the Strings we used for the Keys in step 1.
-    final counterTextFinder = find.byValueKey('counter');
-    final buttonFinder = find.byValueKey('increment');
+  // First, define the Finders and use them to locate widgets from the
+  // test suite. Note: the Strings provided to the `byValueKey` method must
+  // be the same as the Strings we used for the Keys in step 1.
 
-    FlutterDriver driver;
+  FlutterDriver driver;
 
-    // Connect to the Flutter driver before running any tests.
-    setUpAll(() async {
-      driver = await FlutterDriver.connect();
+  // Connect to the Flutter driver before running any tests.
+  setUpAll(() async {
+    driver = await FlutterDriver.connect();
+  });
+
+  // Close the connection to the driver after the tests have completed.
+  tearDownAll(() async {
+    if (driver != null) {
+      driver.close();
+    }
+  });
+  group('Conversion App', () {
+    test("usd to btc take us to the corresponding screen", () async {
+      final findUSDbtn = find.byValueKey("usd-text");
+      final findMainScreenPrompt = find.byValueKey('home-screen-prompt');
+
+      expect(await driver.getText(findMainScreenPrompt),
+          'What type of exchange would you like you make?');
+      // expect(findUSDbtn, "USD to BTC");
+      await driver.tap(findUSDbtn);
+
+      final secondScreenText = find.byValueKey('second-screen-text');
+      expect(await driver.getText(secondScreenText), 'USD to BTC');
     });
 
-    // Close the connection to the driver after the tests have completed.
-    tearDownAll(() async {
-      if (driver != null) {
-        driver.close();
-      }
-    });
+    // test("btc to usd take us to the corresponding screen", () async {
+    //   final findBTCtext = find.byValueKey("btc-text");
+    //   await driver.tap(findBTCtext);
 
-    test('starts at 0', () async {
-      // Use the `driver.getText` method to verify the counter starts at 0.
-      expect(await driver.getText(counterTextFinder), "0");
-    });
+    //   expect(await driver.getText(findBTCtext), "BTC to USD");
+    // });
 
-    test('increments the counter', () async {
-      // First, tap the button.
-      await driver.tap(buttonFinder);
+    test("insert number in input field and convert 61909.20 to 1 btc",
+        () async {
+      final findInputField = find.byValueKey("input-field-one");
+      final convertBtn = find.byValueKey("convert-button");
+      final btcAmountText = find.byValueKey("btc-amount-text");
 
-      // Then, verify the counter text is incremented by 1.
-      expect(await driver.getText(counterTextFinder), "1");
+      await driver.tap(findInputField);
+
+      await driver.enterText('61909.20');
+      await driver.waitFor(find.text('61909.20'));
+      await driver.tap(convertBtn);
+
+      expect(btcAmountText, '1.0');
     });
   });
 }
