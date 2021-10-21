@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bitcoin_calculator/screens/usd_to_btc_screen';
+import 'package:bitcoin_calculator/screens/usd_to_btc_screen.dart';
 import 'package:bitcoin_calculator/screens/btc_to_usd_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("What type of exchange would you like you make?",
+              Text("What type of exchange would you like to make?",
                   key: Key('home-screen-prompt')),
               Padding(
                 padding: EdgeInsets.only(top: 30),

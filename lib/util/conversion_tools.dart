@@ -1,6 +1,10 @@
 class ConversionTools {
   static double btcToUsd(double btc) {
-    return btc * 61909.20;
+    double returnAmnt;
+
+    btc < 0 ? returnAmnt = 0 : returnAmnt = btc * 61909.20;
+
+    return returnAmnt;
   }
 
   static double usdToBtc(double usd) {
