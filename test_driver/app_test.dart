@@ -33,16 +33,15 @@ void main() {
       expect(await driver.getText(secondScreenText), 'USD to BTC');
     });
 
-    test("insert number in input field and convert 61909.20 to 1 btc",
-        () async {
+    test("insert number in input field and convert 5000.55 to 1 btc", () async {
       final findInputField = find.byValueKey("input-field-one");
       final convertBtn = find.byValueKey("convert-button");
       final btcAmountText = find.byValueKey("btc-amount-text");
 
       await driver.tap(findInputField);
 
-      await driver.enterText('61909.20');
-      await driver.waitFor(find.text('61909.20'));
+      await driver.enterText('5000.55');
+      await driver.waitFor(find.text('5000.55'));
       await driver.tap(convertBtn);
 
       expect(await driver.getText(btcAmountText), '1.0 BTC');
@@ -63,8 +62,7 @@ void main() {
       expect(await driver.getText(thirdScreenText), 'BTC to USD');
     });
 
-    test("insert number in input field and convert 1 to 61909.20 usd",
-        () async {
+    test("insert number in input field and convert 1 to 5000.55 usd", () async {
       final findInputField = find.byValueKey("input-field-two");
       final convertBtn = find.byValueKey("convert-button-two");
       final usdAmountText = find.byValueKey("usd-amount-text");
@@ -75,7 +73,7 @@ void main() {
       await driver.waitFor(find.text('1'));
       await driver.tap(convertBtn);
 
-      expect(await driver.getText(usdAmountText), '61909.2 USD');
+      expect(await driver.getText(usdAmountText), '5000.55 USD');
     });
   });
 
