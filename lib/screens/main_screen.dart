@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:bitcoin_calculator/screens/usd_to_btc_screen.dart';
 import 'package:bitcoin_calculator/screens/btc_to_usd_screen.dart';
+import 'package:bitcoin_calculator/config/globals.dart' as globals;
+import '../util/bitcoin_api_tool.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -9,6 +12,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  Future<double> bitCoinValue;
+  @override
+  void initState() {
+    super.initState();
+    bitCoinValue = BitCoinAPI.fetchValue(globals.httpClient);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,8 +28,27 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("What type of exchange would you like to make?",
-                  key: Key('home-screen-prompt')),
+              FutureBuilder<double>(
+                  future: bitCoinValue,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      double BTCvalue = snapshot.data;
+                      return Text(
+                          "${double.parse(BTCvalue.toString()).toStringAsFixed(2)} USD / BTC",
+                          style: TextStyle(fontSize: 35, color: Colors.green));
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    }
+                    return CircularProgressIndicator();
+                  }),
+              SizedBox(height: 20),
+              Padding(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: Text("What type of exchange would you like to make?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22),
+                    key: Key('home-screen-prompt')),
+              ),
               Padding(
                 padding: EdgeInsets.only(top: 30),
                 child: RaisedButton(
@@ -34,7 +63,8 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => USDtoBTCScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => USDtoBTCScreen(bitCoinValue)),
                     );
                   },
                 ),
@@ -53,7 +83,8 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => BTCtoUSDScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => BTCtoUSDScreen(bitCoinValue)),
                     );
                   },
                 ),

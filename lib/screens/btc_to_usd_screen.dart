@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 import '../util/conversion_tools.dart';
+import '../util/bitcoin_api_tool.dart';
+import 'package:bitcoin_calculator/config/globals.dart' as globals;
 
 class BTCtoUSDScreen extends StatefulWidget {
+  final Future<double> btcAPIValue;
+  const BTCtoUSDScreen(this.btcAPIValue);
+
   @override
   State<BTCtoUSDScreen> createState() => _BTCtoUSDScreenState();
 }
@@ -12,23 +16,30 @@ class BTCtoUSDScreen extends StatefulWidget {
 final convertMon = new TextEditingController();
 
 class _BTCtoUSDScreenState extends State<BTCtoUSDScreen> {
+  Future<double> bitCoinValue;
+  @override
+  void initState() {
+    super.initState();
+    bitCoinValue = BitCoinAPI.fetchValue(globals.httpClient);
+  }
+
   double btcAmnt = 0;
   var mon = 0.0;
   var errTxt = '';
   bool errTxtShow = false;
+  double BTCvalue = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-                key: Key("back-to-main"),
-                icon: Icon(Icons.arrow_back_ios_new,
-                    color: Color(0xff4c748b), size: 18),
-                onPressed: () => Navigator.of(context).pop())
-      ),
+      appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+              key: Key("back-to-main"),
+              icon: Icon(Icons.arrow_back_ios_new,
+                  color: Color(0xff4c748b), size: 18),
+              onPressed: () => Navigator.of(context).pop())),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,12 +49,22 @@ class _BTCtoUSDScreenState extends State<BTCtoUSDScreen> {
             SizedBox(height: 20),
             Column(
               children: <Widget>[
-                Text("$mon USD",
-                    style: TextStyle(
-                      fontSize: 40,
-                      color: Colors.green,
-                    ),
-                    key: Key("usd-amount-text")),
+                FutureBuilder<double>(
+                    future: bitCoinValue,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        BTCvalue = snapshot.data;
+                        return Text("$mon USD",
+                            style: TextStyle(
+                              fontSize: 40,
+                              color: Colors.green,
+                            ),
+                            key: Key("usd-amount-text"));
+                      } else if (snapshot.hasError) {
+                        return Text("${snapshot.error}");
+                      }
+                      return CircularProgressIndicator();
+                    }),
                 SizedBox(height: 20),
                 TextField(
                   decoration: InputDecoration(
@@ -83,7 +104,9 @@ class _BTCtoUSDScreenState extends State<BTCtoUSDScreen> {
                       } on Exception {
                         errTxtShow = true;
                       }
-                      mon = double.parse((ConversionTools.btcToUsd(amnt)).toStringAsFixed(2));
+                      mon = double.parse(
+                          (ConversionTools.btcToUsd(BTCvalue, amnt))
+                              .toStringAsFixed(2));
                     });
                   },
                   child: Text('Done'),
